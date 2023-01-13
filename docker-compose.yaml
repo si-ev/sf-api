@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+    # Backend API
+    sf-api:
+        container_name: sf_back
+        build: ./
+        command: >
+            npm start
+            #bash -c "npx prisma migrate dev --name init
+            #&& npx prisma db seed
+            #&& npm start"
+        working_dir: /usr/src/sf-api
+        depends_on:
+            postgres:
+                condition: service_healthy
+        ports:
+            - "3000:3000"
+        volumes:
+            # Anonymous module
+            # Bind volume: Current folder of the host system is 
+            # linked to the /usr/src/sf-api
+            - ./:/usr/src/sf-api
+            #- /usr/src/sf-api/node_modules
+    postgres:
+        build: ./postgres
+        #image: postgres:15
+        container_name: postgres
+        environment: 
+            # Reading variables from .env
+            POSTGRES_HOST: ${DB_HOST}
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        healthcheck:
+            test: pg_isready -U postgres
+        ports:
+            - "5433:5432"

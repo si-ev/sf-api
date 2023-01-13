@@ -1,0 +1,8 @@
+/node_modules
+/uploads
+
+Session.vim
+
+.env
+*.swp
+*.orig
